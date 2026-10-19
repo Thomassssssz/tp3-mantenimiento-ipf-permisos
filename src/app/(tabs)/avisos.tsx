@@ -6,16 +6,27 @@ import {
   Text,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useApp } from '@/context/AppContext';
 import { theme } from '@/lib/theme';
 
 //pantalla de avisos y novedades internas
 export default function Avisos() {
+  const insets = useSafeAreaInsets();
   const { avisos, marcarAvisoLeido } = useApp();
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={[
+        styles.content,
+        {
+          paddingTop: Math.max(insets.top, 16) + 8,
+          paddingBottom: Math.max(insets.bottom, 16) + 28,
+        },
+      ]}
+    >
       <Text style={styles.titulo}>Avisos</Text>
       <Text style={styles.subtitulo}>
         Bandeja interna de novedades y resoluciones de reportes, activa incluso sin notificaciones push.
@@ -93,6 +104,7 @@ export default function Avisos() {
                 <Pressable
                   style={styles.botonLeido}
                   onPress={() => marcarAvisoLeido(aviso.id)}
+                  hitSlop={8}
                 >
                   <Ionicons name="checkmark-outline" size={15} color={theme.colors.primary} />
                   <Text style={styles.textoBotonLeido}>Marcar como leído</Text>
@@ -112,8 +124,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background,
   },
   content: {
-    padding: theme.spacing.xl,
-    paddingBottom: 40,
+    paddingHorizontal: theme.spacing.xl,
   },
   titulo: {
     fontSize: 26,
@@ -260,6 +271,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: theme.colors.border,
     marginTop: 4,
+    minHeight: 36,
   },
   textoBotonLeido: {
     fontSize: 12,

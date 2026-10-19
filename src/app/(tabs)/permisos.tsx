@@ -8,6 +8,7 @@ import {
   View,
 } from 'react-native';
 import { router } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { TipoRecurso } from '@/lib/types';
 import { RECURSOS_INFO, obtenerEtiquetaEstado } from '@/lib/permisos';
@@ -119,12 +120,12 @@ function TarjetaPermiso({ recurso }: { recurso: TipoRecurso }) {
             <Text style={styles.textoConcedido}>Habilitado correctamente</Text>
           </View>
         ) : estado === 'preguntable' ? (
-          <Pressable style={styles.botonAccion} onPress={navegarAExplicacion}>
+          <Pressable style={styles.botonAccion} onPress={navegarAExplicacion} hitSlop={6}>
             <Text style={styles.textoBotonAccion}>Solicitar permiso</Text>
             <Ionicons name="chevron-forward" size={16} color="#ffffff" />
           </Pressable>
         ) : estado === 'bloqueado' ? (
-          <Pressable style={[styles.botonAccion, styles.botonBloqueado]} onPress={navegarAExplicacion}>
+          <Pressable style={[styles.botonAccion, styles.botonBloqueado]} onPress={navegarAExplicacion} hitSlop={6}>
             <Text style={styles.textoBotonAccion}>Ver cómo habilitar en Ajustes</Text>
             <Ionicons name="open-outline" size={15} color="#ffffff" />
           </Pressable>
@@ -140,8 +141,19 @@ function TarjetaPermiso({ recurso }: { recurso: TipoRecurso }) {
 
 //pantalla de control general de permisos
 export default function Permisos() {
+  const insets = useSafeAreaInsets();
+
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={[
+        styles.content,
+        {
+          paddingTop: Math.max(insets.top, 16) + 8,
+          paddingBottom: Math.max(insets.bottom, 16) + 28,
+        },
+      ]}
+    >
       <Text style={styles.titulo}>Permisos</Text>
       <Text style={styles.subtitulo}>
         Controlá qué funciones puede utilizar la aplicación.
@@ -172,8 +184,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background,
   },
   content: {
-    padding: theme.spacing.xl,
-    paddingBottom: 40,
+    paddingHorizontal: theme.spacing.xl,
   },
   titulo: {
     fontSize: 26,
@@ -285,11 +296,12 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.primary,
     flexDirection: 'row',
     gap: 6,
-    paddingVertical: 10,
+    paddingVertical: 11,
     paddingHorizontal: 14,
     borderRadius: theme.borderRadius.md,
     alignItems: 'center',
     justifyContent: 'center',
+    minHeight: 44,
     ...theme.shadows.button,
   },
   botonBloqueado: {
@@ -321,6 +333,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginTop: 8,
     marginBottom: 20,
+    minHeight: 48,
     ...theme.shadows.card,
   },
   textoBotonAjustesSeccion: {

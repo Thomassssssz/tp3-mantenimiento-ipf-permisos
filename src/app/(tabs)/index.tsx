@@ -1,5 +1,6 @@
 import { Link, router } from "expo-router";
 import { Pressable, StyleSheet, Text, View, ScrollView, Image } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useApp } from "@/context/AppContext";
 import { CategoriaReporte } from "@/lib/types";
@@ -26,11 +27,21 @@ function getCategoriaConfig(categoria: CategoriaReporte): {
 
 //pantalla principal con lista de reportes
 export default function Inicio() {
+  const insets = useSafeAreaInsets();
   const { reportes } = useApp();
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      {/*barra superior con logo institucional*/}
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={[
+        styles.content,
+        {
+          paddingTop: Math.max(insets.top, 16) + 8,
+          paddingBottom: Math.max(insets.bottom, 16) + 28,
+        },
+      ]}
+    >
+      {/*barra superior con logo institucional respetando safe area*/}
       <View style={styles.topBar}>
         <View style={styles.headerIzquierda}>
           <Image
@@ -38,7 +49,7 @@ export default function Inicio() {
             style={styles.logo}
             resizeMode="contain"
           />
-          <View>
+          <View style={styles.textosHeader}>
             <Text style={styles.titulo}>Mantenimiento IPF</Text>
             <Text style={styles.descripcion}>Reportá desperfectos del Instituto.</Text>
           </View>
@@ -48,6 +59,7 @@ export default function Inicio() {
         <Pressable
           style={styles.botonAjustesTop}
           onPress={() => router.push('/ajustes-app')}
+          hitSlop={8}
         >
           <Ionicons name="settings-outline" size={15} color="#334155" />
           <Text style={styles.textoBotonAjustesTop}>Ajustes</Text>
@@ -149,8 +161,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background,
   },
   content: {
-    padding: theme.spacing.xl,
-    paddingBottom: 40,
+    paddingHorizontal: theme.spacing.xl,
   },
   topBar: {
     flexDirection: 'row',
@@ -165,6 +176,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
+    flex: 1,
+  },
+  textosHeader: {
     flex: 1,
   },
   logo: {
@@ -188,11 +202,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 6,
     backgroundColor: theme.colors.surface,
-    paddingVertical: 7,
+    paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: theme.borderRadius.md,
     borderWidth: 1,
     borderColor: theme.colors.border,
+    minHeight: 40,
     ...theme.shadows.card,
   },
   textoBotonAjustesTop: {
@@ -315,6 +330,7 @@ const styles = StyleSheet.create({
     borderRadius: theme.borderRadius.md,
     alignItems: 'center',
     justifyContent: 'center',
+    minHeight: 48,
     ...theme.shadows.button,
   },
   textoBoton: {

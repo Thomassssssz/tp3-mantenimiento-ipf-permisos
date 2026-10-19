@@ -1,9 +1,14 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Tabs } from "expo-router/js-tabs";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { theme } from "@/lib/theme";
 
-//configuracion visual de las pestanas inferiores
+//configuracion visual de las pestanas inferiores con safe area
 export default function TabsLayout() {
+  const insets = useSafeAreaInsets();
+  const bottomPadding = insets.bottom > 0 ? insets.bottom : 8;
+  const tabHeight = 54 + bottomPadding;
+
   return (
     <Tabs
       screenOptions={{
@@ -13,13 +18,18 @@ export default function TabsLayout() {
           backgroundColor: theme.colors.surface,
           borderTopColor: theme.colors.border,
           borderTopWidth: 1,
-          height: 60,
-          paddingBottom: 8,
+          height: tabHeight,
           paddingTop: 6,
+          paddingBottom: bottomPadding,
+        },
+        tabBarItemStyle: {
+          justifyContent: 'center',
+          alignItems: 'center',
         },
         tabBarLabelStyle: {
-          fontSize: 12,
+          fontSize: 11,
           fontWeight: '600',
+          marginTop: 2,
         },
         headerShown: false,
       }}
