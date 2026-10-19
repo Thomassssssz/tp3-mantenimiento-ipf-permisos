@@ -1,5 +1,17 @@
 import { Stack } from "expo-router";
+import * as Notifications from "expo-notifications";
 import { AppProvider } from "@/context/AppContext";
+
+//configurar presentacion de notificaciones en primer plano
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
 
 export default function RootLayout() {
   return (
@@ -19,6 +31,9 @@ export default function RootLayout() {
         <Stack.Screen name="reporte/escanear" options={{ title: "Escanear QR" }} />
         <Stack.Screen name="reporte/foto" options={{ title: "Adjuntar foto" }} />
         <Stack.Screen name="reporte/ubicacion" options={{ title: "Ubicación" }} />
+        <Stack.Screen name="reporte/[id]" options={{ title: "Detalle de reporte" }} />
+        {/* ruta para ajustes de la app */}
+        <Stack.Screen name="ajustes-app" options={{ title: "Ajustes de la App" }} />
       </Stack>
     </AppProvider>
   );

@@ -97,6 +97,16 @@ export default function Permisos() {
       {LISTA_RECURSOS.map((recurso) => (
         <TarjetaPermiso key={recurso} recurso={recurso} />
       ))}
+
+      {/* acceso directo a ajustes de la app */}
+      <Pressable
+        style={styles.botonAjustesSeccion}
+        onPress={() => router.push('/ajustes-app')}
+      >
+        <Text style={styles.textoBotonAjustesSeccion}>
+          Configurar notificaciones en Ajustes de la App ›
+        </Text>
+      </Pressable>
     </ScrollView>
   );
 }
@@ -218,5 +228,21 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#94a3b8',
     fontStyle: 'italic',
+  },
+  botonAjustesSeccion: {
+    backgroundColor: '#f1f5f9',
+    borderWidth: 1,
+    borderColor: '#cbd5e1',
+    borderRadius: 10,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    alignItems: 'center',
+    marginTop: 8,
+    marginBottom: 20,
+  },
+  textoBotonAjustesSeccion: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#208AEF',
   },
 });

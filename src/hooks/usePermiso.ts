@@ -1,4 +1,4 @@
-import { abrirAjustesDispositivo } from "@/lib/permisos";
+import { abrirAjustesDispositivo, asegurarCanalReportesAndroid } from "@/lib/permisos";
 import { EstadoPermiso, TipoRecurso } from "@/lib/types";
 import { Camera } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
@@ -122,14 +122,8 @@ export function usePermiso(recurso: TipoRecurso | null): UsePermisoResult {
       }
 
       if (recurso === "notifications") {
-        if (Platform.OS === "android") {
-          await Notifications.setNotificationChannelAsync("reportes", {
-            name: "Reportes de Mantenimiento",
-            importance: Notifications.AndroidImportance.HIGH,
-            vibrationPattern: [0, 250, 250, 250],
-            lightColor: "#208AEF",
-          });
-        }
+        //asegurar canal reportes en android antes de pedir permiso
+        await asegurarCanalReportesAndroid();
 
         const res = await Notifications.requestPermissionsAsync({
           ios: {

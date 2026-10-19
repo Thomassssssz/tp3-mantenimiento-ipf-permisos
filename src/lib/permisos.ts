@@ -1,4 +1,5 @@
-import { Linking } from 'react-native';
+import { Linking, Platform } from 'react-native';
+import * as Notifications from 'expo-notifications';
 import { InfoRecurso, TipoRecurso, EstadoPermiso } from './types';
 
 export const RECURSOS_INFO: Record<TipoRecurso, InfoRecurso> = {
@@ -37,6 +38,18 @@ export async function abrirAjustesDispositivo(): Promise<void> {
     await Linking.openSettings();
   } catch (error) {
     console.error('Error al abrir los ajustes del dispositivo:', error);
+  }
+}
+
+//asegurar canal de notificaciones en android
+export async function asegurarCanalReportesAndroid(): Promise<void> {
+  if (Platform.OS === 'android') {
+    await Notifications.setNotificationChannelAsync('reportes', {
+      name: 'Reportes de Mantenimiento',
+      importance: Notifications.AndroidImportance.HIGH,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: '#208AEF',
+    });
   }
 }
 
