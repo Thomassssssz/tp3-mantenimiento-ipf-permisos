@@ -6,6 +6,14 @@ export default function RootLayout() {
     <AppProvider>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="permisos/[recurso]"
+          options={{
+            presentation: "modal",
+            title: "Permiso",
+            headerShown: true,
+          }}
+        />
       </Stack>
     </AppProvider>
   );
