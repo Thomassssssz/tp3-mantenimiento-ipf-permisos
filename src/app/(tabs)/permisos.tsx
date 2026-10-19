@@ -8,15 +8,54 @@ import {
   View,
 } from 'react-native';
 import { router } from 'expo-router';
-import { TipoRecurso, EstadoPermiso } from '@/lib/types';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { TipoRecurso } from '@/lib/types';
 import { RECURSOS_INFO, obtenerEtiquetaEstado } from '@/lib/permisos';
 import { usePermiso } from '@/hooks/usePermiso';
+import { theme } from '@/lib/theme';
 
 const LISTA_RECURSOS: TipoRecurso[] = ['camera', 'location', 'photos', 'notifications'];
 
+interface RecursoVisualConfig {
+  icon: keyof typeof Ionicons.glyphMap;
+  color: string;
+  bgIcono: string;
+  descripcionBreve: string;
+}
+
+const CONFIG_VISUAL_RECURSOS: Record<TipoRecurso, RecursoVisualConfig> = {
+  camera: {
+    icon: 'camera-outline',
+    color: '#208AEF',
+    bgIcono: '#e0f2fe',
+    descripcionBreve: 'Necesaria para escanear QR y tomar fotografías.',
+  },
+  location: {
+    icon: 'location-outline',
+    color: '#0284c7',
+    bgIcono: '#e0f2fe',
+    descripcionBreve: 'Necesaria para georreferenciar el desperfecto en el instituto.',
+  },
+  photos: {
+    icon: 'images-outline',
+    color: '#7c3aed',
+    bgIcono: '#f3e8ff',
+    descripcionBreve: 'Permite seleccionar imágenes existentes con el selector del sistema.',
+  },
+  notifications: {
+    icon: 'notifications-outline',
+    color: '#d97706',
+    bgIcono: '#fef3c7',
+    descripcionBreve: 'Necesarias para recibir avisos cuando se resuelvan tus reportes.',
+  },
+};
+
+//tarjeta individual para el estado de cada permiso
 function TarjetaPermiso({ recurso }: { recurso: TipoRecurso }) {
   const { estado, parcial } = usePermiso(recurso);
   const info = RECURSOS_INFO[recurso];
+  const visual = CONFIG_VISUAL_RECURSOS[recurso];
+  const estadoEstilo = theme.colors.permisos[estado] || theme.colors.permisos.cargando;
 
   const navegarAExplicacion = () => {
     router.push({
@@ -25,87 +64,103 @@ function TarjetaPermiso({ recurso }: { recurso: TipoRecurso }) {
     });
   };
 
-  const badgeColor = {
-    cargando: '#94a3b8',
-    concedido: '#16a34a',
-    preguntable: '#0284c7',
-    bloqueado: '#dc2626',
-  }[estado];
-
   return (
     <View style={styles.tarjeta}>
+      {/*encabezado de la tarjeta con icono, nombre y chip de estado*/}
       <View style={styles.headerTarjeta}>
-        <Text style={styles.nombreRecurso}>{info.nombre}</Text>
-        <View style={[styles.badgeEstado, { backgroundColor: badgeColor }]}>
-          <Text style={styles.textoBadgeEstado}>
+        <View style={styles.iconoYNombre}>
+          <View style={[styles.iconoWrapper, { backgroundColor: visual.bgIcono }]}>
+            <Ionicons name={visual.icon} size={22} color={visual.color} />
+          </View>
+          <View>
+            <Text style={styles.nombreRecurso}>{info.nombre}</Text>
+            <Text style={styles.plataformaTexto}>
+              Plataforma: <Text style={styles.plataformaValor}>{Platform.OS.toUpperCase()}</Text>
+            </Text>
+          </View>
+        </View>
+
+        <View
+          style={[
+            styles.chipEstado,
+            { backgroundColor: estadoEstilo.bg, borderColor: estadoEstilo.border },
+          ]}
+        >
+          <Text style={[styles.textoChipEstado, { color: estadoEstilo.text }]}>
             {obtenerEtiquetaEstado(estado, parcial)}
           </Text>
         </View>
       </View>
 
-      <View style={styles.detallesFila}>
-        <Text style={styles.plataformaTexto}>
-          Sistema: <Text style={styles.plataformaValor}>{Platform.OS.toUpperCase()}</Text>
-        </Text>
+      {/*badge si cuenta con acceso parcial*/}
+      {parcial && (
+        <View style={styles.badgeParcial}>
+          <Ionicons name="information-circle-outline" size={14} color="#d97706" />
+          <Text style={styles.textoBadgeParcial}>
+            {recurso === 'location'
+              ? 'Acceso a ubicación aproximada activa'
+              : recurso === 'photos'
+              ? 'Acceso a fotos limitado activo'
+              : 'Acceso parcial'}
+          </Text>
+        </View>
+      )}
 
-        {parcial && (
-          <View style={styles.badgeParcial}>
-            <Text style={styles.textoBadgeParcial}>
-              {recurso === 'location'
-                ? 'Aproximada'
-                : recurso === 'photos'
-                ? 'Limitada'
-                : 'Parcial'}
-            </Text>
-          </View>
-        )}
-      </View>
-
-      <Text style={styles.descripcionCorta} numberOfLines={2}>
-        {info.descripcionUso}
+      {/*descripcion breve solicitada*/}
+      <Text style={styles.descripcionCorta}>
+        {visual.descripcionBreve}
       </Text>
 
+      {/*acciones segun estado*/}
       <View style={styles.accionContainer}>
         {estado === 'concedido' ? (
           <View style={styles.contenedorConcedido}>
+            <Ionicons name="checkmark-circle" size={18} color="#16a34a" />
             <Text style={styles.textoConcedido}>Habilitado correctamente</Text>
           </View>
         ) : estado === 'preguntable' ? (
           <Pressable style={styles.botonAccion} onPress={navegarAExplicacion}>
             <Text style={styles.textoBotonAccion}>Solicitar permiso</Text>
+            <Ionicons name="chevron-forward" size={16} color="#ffffff" />
           </Pressable>
         ) : estado === 'bloqueado' ? (
           <Pressable style={[styles.botonAccion, styles.botonBloqueado]} onPress={navegarAExplicacion}>
-            <Text style={styles.textoBotonAccion}>Ver cómo habilitar</Text>
+            <Text style={styles.textoBotonAccion}>Ver cómo habilitar en Ajustes</Text>
+            <Ionicons name="open-outline" size={15} color="#ffffff" />
           </Pressable>
         ) : (
-          <Text style={styles.textoConsultando}>Consultando estado...</Text>
+          <View style={styles.contenedorCargando}>
+            <Text style={styles.textoConsultando}>Consultando estado...</Text>
+          </View>
         )}
       </View>
     </View>
   );
 }
 
+//pantalla de control general de permisos
 export default function Permisos() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.titulo}>Permisos del Sistema</Text>
+      <Text style={styles.titulo}>Permisos</Text>
       <Text style={styles.subtitulo}>
-        Monitoreo del estado de cada permiso nativo y sus alternativas de acceso.
+        Controlá qué funciones puede utilizar la aplicación.
       </Text>
 
       {LISTA_RECURSOS.map((recurso) => (
         <TarjetaPermiso key={recurso} recurso={recurso} />
       ))}
 
-      {/* acceso directo a ajustes de la app */}
+      {/*acceso directo a ajustes de la app*/}
       <Pressable
         style={styles.botonAjustesSeccion}
         onPress={() => router.push('/ajustes-app')}
       >
+        <Ionicons name="notifications-outline" size={18} color={theme.colors.primary} />
         <Text style={styles.textoBotonAjustesSeccion}>
-          Configurar notificaciones en Ajustes de la App ›
+          Configurar preferencias de notificaciones
         </Text>
+        <Ionicons name="chevron-forward" size={16} color={theme.colors.primary} />
       </Pressable>
     </ScrollView>
   );
@@ -114,135 +169,165 @@ export default function Permisos() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: theme.colors.background,
   },
   content: {
-    padding: 20,
+    padding: theme.spacing.xl,
     paddingBottom: 40,
   },
   titulo: {
     fontSize: 26,
-    fontWeight: 'bold',
-    color: '#0f172a',
-    marginBottom: 6,
+    fontWeight: '800',
+    color: theme.colors.textPrimary,
+    letterSpacing: -0.3,
+    marginBottom: 4,
   },
   subtitulo: {
     fontSize: 14,
-    color: '#64748b',
+    color: theme.colors.textMuted,
     marginBottom: 20,
     lineHeight: 20,
   },
   tarjeta: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 16,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.lg,
+    padding: theme.spacing.lg,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#e2e8f0',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 2,
+    borderColor: theme.colors.border,
+    ...theme.shadows.card,
   },
   headerTarjeta: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
-  },
-  nombreRecurso: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1e293b',
-  },
-  badgeEstado: {
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderRadius: 6,
-  },
-  textoBadgeEstado: {
-    color: '#ffffff',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  detallesFila: {
-    flexDirection: 'row',
-    alignItems: 'center',
     marginBottom: 10,
     gap: 8,
   },
+  iconoYNombre: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    flex: 1,
+  },
+  iconoWrapper: {
+    width: 42,
+    height: 42,
+    borderRadius: theme.borderRadius.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  nombreRecurso: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+  },
   plataformaTexto: {
-    fontSize: 13,
-    color: '#64748b',
+    fontSize: 12,
+    color: theme.colors.textMuted,
+    marginTop: 2,
   },
   plataformaValor: {
     fontWeight: '600',
     color: '#334155',
   },
-  badgeParcial: {
-    backgroundColor: '#fef3c7',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
+  chipEstado: {
+    paddingVertical: 4,
+    paddingHorizontal: 9,
+    borderRadius: 20,
+    borderWidth: 1,
   },
-  textoBadgeParcial: {
+  textoChipEstado: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#d97706',
+    textTransform: 'capitalize',
+  },
+  badgeParcial: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#fef3c7',
+    borderWidth: 1,
+    borderColor: '#fde68a',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: theme.borderRadius.sm,
+    marginBottom: 10,
+  },
+  textoBadgeParcial: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#b45309',
   },
   descripcionCorta: {
     fontSize: 13,
-    color: '#475569',
-    lineHeight: 18,
+    color: theme.colors.textSecondary,
+    lineHeight: 19,
     marginBottom: 14,
   },
   accionContainer: {
     borderTopWidth: 1,
-    borderTopColor: '#f1f5f9',
+    borderTopColor: theme.colors.borderLight,
     paddingTop: 12,
   },
   contenedorConcedido: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
     paddingVertical: 6,
   },
   textoConcedido: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
     color: '#16a34a',
   },
   botonAccion: {
-    backgroundColor: '#208AEF',
+    backgroundColor: theme.colors.primary,
+    flexDirection: 'row',
+    gap: 6,
     paddingVertical: 10,
-    borderRadius: 8,
+    paddingHorizontal: 14,
+    borderRadius: theme.borderRadius.md,
     alignItems: 'center',
+    justifyContent: 'center',
+    ...theme.shadows.button,
   },
   botonBloqueado: {
     backgroundColor: '#475569',
+    shadowColor: '#475569',
   },
   textoBotonAccion: {
     color: '#ffffff',
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  contenedorCargando: {
+    paddingVertical: 6,
   },
   textoConsultando: {
     fontSize: 13,
-    color: '#94a3b8',
+    color: theme.colors.textLight,
     fontStyle: 'italic',
   },
   botonAjustesSeccion: {
-    backgroundColor: '#f1f5f9',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: theme.colors.surface,
     borderWidth: 1,
-    borderColor: '#cbd5e1',
-    borderRadius: 10,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius.md,
     paddingVertical: 14,
     paddingHorizontal: 16,
-    alignItems: 'center',
     marginTop: 8,
     marginBottom: 20,
+    ...theme.shadows.card,
   },
   textoBotonAjustesSeccion: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#208AEF',
+    fontSize: 13,
+    fontWeight: '600',
+    color: theme.colors.primary,
+    flex: 1,
+    marginHorizontal: 10,
   },
 });

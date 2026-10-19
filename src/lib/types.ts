@@ -5,7 +5,7 @@ export type EstadoPermiso = 'cargando' | 'concedido' | 'preguntable' | 'bloquead
 export interface PermisoEstado {
   recurso: TipoRecurso;
   estado: EstadoPermiso;
-  parcial: boolean; // true si es ubicación aproximada o fotos limitadas
+  parcial: boolean; //true si es ubicacion aproximada o fotos limitadas
   detalle?: string;
 }
 

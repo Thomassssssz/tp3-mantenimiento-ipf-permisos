@@ -6,8 +6,11 @@ import {
   Text,
   View,
 } from 'react-native';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { useApp } from '@/context/AppContext';
+import { theme } from '@/lib/theme';
 
+//pantalla de avisos y novedades internas
 export default function Avisos() {
   const { avisos, marcarAvisoLeido } = useApp();
 
@@ -15,15 +18,18 @@ export default function Avisos() {
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Text style={styles.titulo}>Avisos</Text>
       <Text style={styles.subtitulo}>
-        Canal interno de novedades y resoluciones de reportes, disponible incluso si las notificaciones del sistema están desactivadas.
+        Bandeja interna de novedades y resoluciones de reportes, activa incluso sin notificaciones push.
       </Text>
 
-      {/* lista de avisos o mensaje vacio */}
+      {/*empty state si no existen avisos*/}
       {avisos.length === 0 ? (
-        <View style={styles.cajaVacia}>
-          <Text style={styles.vacio}>Todavía no hay avisos.</Text>
-          <Text style={styles.detalleVacio}>
-            Cuando se resuelva un reporte y no tengas notificaciones habilitadas, aparecerá aquí.
+        <View style={styles.tarjetaVacia}>
+          <View style={styles.iconoVacioWrapper}>
+            <Ionicons name="notifications-off-outline" size={36} color={theme.colors.textLight} />
+          </View>
+          <Text style={styles.vacio}>No tenés avisos por ahora</Text>
+          <Text style={styles.vacioDetalle}>
+            Cuando se resuelva un reporte o cambie de estado, vas a recibir el aviso acá.
           </Text>
         </View>
       ) : (
@@ -36,26 +42,59 @@ export default function Avisos() {
                 !aviso.leido && styles.tarjetaNoLeida,
               ]}
             >
+              {/*encabezado con icono, titulo e indicador de lectura*/}
               <View style={styles.filaHeader}>
-                <Text style={styles.avisoTitulo}>{aviso.titulo}</Text>
-                {!aviso.leido && (
-                  <View style={styles.badgeNuevo}>
-                    <Text style={styles.textoBadgeNuevo}>Nuevo</Text>
+                <View style={styles.tituloContenedor}>
+                  <View
+                    style={[
+                      styles.iconoAvisoCirculo,
+                      !aviso.leido ? styles.iconoNoLeido : styles.iconoLeido,
+                    ]}
+                  >
+                    <Ionicons
+                      name={!aviso.leido ? "mail-unread-outline" : "mail-open-outline"}
+                      size={18}
+                      color={!aviso.leido ? theme.colors.primary : theme.colors.textMuted}
+                    />
                   </View>
-                )}
+                  <View style={styles.textosHeader}>
+                    <Text style={styles.avisoTitulo} numberOfLines={1}>
+                      {aviso.titulo}
+                    </Text>
+                    <Text style={styles.avisoFecha}>
+                      {new Date(aviso.fecha).toLocaleString()}
+                    </Text>
+                  </View>
+                </View>
+
+                {/*chip indicador de leido o no leido*/}
+                <View
+                  style={[
+                    styles.chipLectura,
+                    !aviso.leido ? styles.chipNoLeido : styles.chipLeido,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.textoChipLectura,
+                      !aviso.leido ? styles.textoChipNoLeido : styles.textoChipLeido,
+                    ]}
+                  >
+                    {!aviso.leido ? "No leído" : "Leído"}
+                  </Text>
+                </View>
               </View>
 
-              <Text style={styles.avisoFecha}>
-                {new Date(aviso.fecha).toLocaleString()}
-              </Text>
-
+              {/*cuerpo del mensaje*/}
               <Text style={styles.avisoMensaje}>{aviso.mensaje}</Text>
 
+              {/*accion para marcar como leido*/}
               {!aviso.leido && (
                 <Pressable
                   style={styles.botonLeido}
                   onPress={() => marcarAvisoLeido(aviso.id)}
                 >
+                  <Ionicons name="checkmark-outline" size={15} color={theme.colors.primary} />
                   <Text style={styles.textoBotonLeido}>Marcar como leído</Text>
                 </Pressable>
               )}
@@ -70,104 +109,161 @@ export default function Avisos() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: theme.colors.background,
   },
   content: {
-    padding: 20,
+    padding: theme.spacing.xl,
     paddingBottom: 40,
   },
   titulo: {
     fontSize: 26,
-    fontWeight: 'bold',
-    color: '#0f172a',
-    marginBottom: 6,
+    fontWeight: '800',
+    color: theme.colors.textPrimary,
+    letterSpacing: -0.3,
+    marginBottom: 4,
   },
   subtitulo: {
     fontSize: 13,
-    color: '#64748b',
-    lineHeight: 18,
+    color: theme.colors.textMuted,
+    lineHeight: 19,
     marginBottom: 20,
   },
-  cajaVacia: {
-    padding: 30,
-    backgroundColor: '#f8fafc',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
+  tarjetaVacia: {
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.lg,
+    padding: 32,
     alignItems: 'center',
-    marginVertical: 10,
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderStyle: 'dashed',
+    marginTop: 10,
+  },
+  iconoVacioWrapper: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: theme.colors.borderLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
   },
   vacio: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#334155',
+    color: theme.colors.textPrimary,
     marginBottom: 6,
+    textAlign: 'center',
   },
-  detalleVacio: {
+  vacioDetalle: {
     fontSize: 13,
-    color: '#94a3b8',
+    color: theme.colors.textMuted,
     textAlign: 'center',
     lineHeight: 18,
+    maxWidth: 280,
   },
   listaAvisos: {
     gap: 12,
   },
   tarjetaAviso: {
-    backgroundColor: '#f8fafc',
-    borderRadius: 10,
-    padding: 16,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.lg,
+    padding: theme.spacing.lg,
     borderWidth: 1,
-    borderColor: '#e2e8f0',
+    borderColor: theme.colors.border,
+    ...theme.shadows.card,
   },
   tarjetaNoLeida: {
-    borderColor: '#93c5fd',
-    backgroundColor: '#eff6ff',
+    borderColor: '#bfdbfe',
+    backgroundColor: '#ffffff',
+    borderLeftWidth: 4,
+    borderLeftColor: theme.colors.primary,
   },
   filaHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 4,
+    alignItems: 'flex-start',
+    marginBottom: 10,
+    gap: 10,
   },
-  avisoTitulo: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#0f172a',
+  tituloContenedor: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
     flex: 1,
   },
-  badgeNuevo: {
-    backgroundColor: '#208AEF',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
+  iconoAvisoCirculo: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  textoBadgeNuevo: {
-    color: '#fff',
+  iconoNoLeido: {
+    backgroundColor: theme.colors.primaryLight,
+  },
+  iconoLeido: {
+    backgroundColor: theme.colors.borderLight,
+  },
+  textosHeader: {
+    flex: 1,
+  },
+  avisoTitulo: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+  },
+  avisoFecha: {
+    fontSize: 11,
+    color: theme.colors.textLight,
+    marginTop: 2,
+  },
+  chipLectura: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 20,
+    borderWidth: 1,
+  },
+  chipNoLeido: {
+    backgroundColor: theme.colors.primaryLight,
+    borderColor: '#bae6fd',
+  },
+  chipLeido: {
+    backgroundColor: theme.colors.borderLight,
+    borderColor: theme.colors.border,
+  },
+  textoChipLectura: {
     fontSize: 11,
     fontWeight: '700',
   },
-  avisoFecha: {
-    fontSize: 12,
-    color: '#64748b',
-    marginBottom: 8,
+  textoChipNoLeido: {
+    color: theme.colors.primary,
+  },
+  textoChipLeido: {
+    color: theme.colors.textMuted,
   },
   avisoMensaje: {
-    fontSize: 14,
-    color: '#334155',
-    lineHeight: 20,
+    fontSize: 13,
+    color: theme.colors.textSecondary,
+    lineHeight: 19,
     marginBottom: 10,
   },
   botonLeido: {
     alignSelf: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
     paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 6,
-    backgroundColor: '#e2e8f0',
+    paddingHorizontal: 10,
+    borderRadius: 8,
+    backgroundColor: theme.colors.borderLight,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
     marginTop: 4,
   },
   textoBotonLeido: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#334155',
+    color: theme.colors.primary,
   },
 });
