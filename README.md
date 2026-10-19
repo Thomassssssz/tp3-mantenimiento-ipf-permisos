@@ -195,34 +195,34 @@ El hook unificado `usePermiso(recurso)` administra el ciclo de vida del permiso 
 A continuación se disponen los marcadores de evidencia visual para documentar el funcionamiento en dispositivo:
 
 ### Escáner - cargando
-[PENDIENTE: captura]
+> Evidencia no incluida en esta entrega.
 
 ### Escáner - concedido
-[PENDIENTE: captura]
+![Escáner concedido](docs/capturas/02-escaner-concedido.png)
 
 ### Escáner - preguntable
-[PENDIENTE: captura]
+![Escáner preguntable](docs/capturas/03-escaner-preguntable.png)
 
 ### Escáner - bloqueado
-[PENDIENTE: captura]
+![Escáner bloqueado](docs/capturas/04-escaner-bloqueado.png)
 
 ### Ubicación concedida
-[PENDIENTE: captura]
+![Ubicación concedida](docs/capturas/05-ubicacion-concedida.png)
 
 ### Ubicación denegada / sector manual
-[PENDIENTE: captura]
+![Ubicación manual](docs/capturas/06-ubicacion-denegada-manual.png)
 
 ### Foto desde selector del sistema
-[PENDIENTE: captura]
+![Foto selector](docs/capturas/07-foto-selector.png)
 
 ### Notificación recibida
-[PENDIENTE: captura]
+![Notificación recibida](docs/capturas/08-notificacion-recibida.png)
 
 ### Panel de permisos antes de Ajustes
-[PENDIENTE: captura]
+![Permisos antes](docs/capturas/09-permisos-antes-ajustes.png)
 
 ### Panel de permisos después de Ajustes
-[PENDIENTE: captura]
+![Permisos después](docs/capturas/10-permisos-despues-ajustes.png)
 
 ### Diálogo del sistema en development build
-[PENDIENTE: captura]
+> Evidencia no incluida en esta entrega.
