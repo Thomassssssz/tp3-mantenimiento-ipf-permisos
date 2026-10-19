@@ -35,6 +35,17 @@ export interface Reporte {
 
 export type NuevoReporteInput = Omit<Reporte, 'id' | 'estado' | 'creadoEn' | 'resueltoEn'>;
 
+//tipo de borrador para el reporte en proceso
+export interface BorradorReporte {
+  titulo: string;
+  descripcion: string;
+  aula: string;
+  categoria: CategoriaReporte | null;
+  fotoUri?: string;
+  ubicacion?: ReporteUbicacion;
+  sectorManual?: string;
+}
+
 export interface Aviso {
   id: string;
   reporteId?: string;

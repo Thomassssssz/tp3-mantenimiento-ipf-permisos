@@ -5,13 +5,28 @@ import {
   NuevoReporteInput,
   NuevoAvisoInput,
   EstadoReporte,
+  BorradorReporte,
 } from '@/lib/types';
+
+//estado inicial del borrador
+const borradorInicial: BorradorReporte = {
+  titulo: '',
+  descripcion: '',
+  aula: '',
+  categoria: null,
+  fotoUri: undefined,
+  ubicacion: undefined,
+  sectorManual: undefined,
+};
 
 interface AppContextType {
   reportes: Reporte[];
   avisos: Aviso[];
   notificacionesHabilitadas: boolean;
+  borradorReporte: BorradorReporte;
   setNotificacionesHabilitadas: (habilitadas: boolean) => void;
+  actualizarBorrador: (datos: Partial<BorradorReporte>) => void;
+  limpiarBorrador: () => void;
   crearReporte: (datos: NuevoReporteInput) => Reporte;
   resolverReporte: (id: string) => void;
   cambiarEstadoReporte: (id: string, nuevoEstado: EstadoReporte) => void;
@@ -26,6 +41,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [reportes, setReportes] = useState<Reporte[]>([]);
   const [avisos, setAvisos] = useState<Aviso[]>([]);
   const [notificacionesHabilitadas, setNotificacionesHabilitadas] = useState<boolean>(false);
+  const [borradorReporte, setBorradorReporte] = useState<BorradorReporte>(borradorInicial);
+
+  //actualizar campos parciales del borrador
+  const actualizarBorrador = (datos: Partial<BorradorReporte>) => {
+    setBorradorReporte((prev) => ({
+      ...prev,
+      ...datos,
+    }));
+  };
+
+  //reiniciar el borrador al estado inicial
+  const limpiarBorrador = () => {
+    setBorradorReporte(borradorInicial);
+  };
 
   const crearReporte = (datos: NuevoReporteInput): Reporte => {
     const nuevoReporte: Reporte = {
@@ -89,7 +118,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
         reportes,
         avisos,
         notificacionesHabilitadas,
+        borradorReporte,
         setNotificacionesHabilitadas,
+        actualizarBorrador,
+        limpiarBorrador,
         crearReporte,
         resolverReporte,
         cambiarEstadoReporte,
