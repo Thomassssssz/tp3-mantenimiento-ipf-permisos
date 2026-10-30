@@ -41,7 +41,7 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? "document-text" : "document-text-outline"}
-              color={color}
+              color={typeof color === 'string' ? color : theme.colors.textMuted}
               size={22}
             />
           ),
@@ -55,7 +55,7 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? "notifications" : "notifications-outline"}
-              color={color}
+              color={typeof color === 'string' ? color : theme.colors.textMuted}
               size={22}
             />
           ),
@@ -69,7 +69,7 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? "shield-checkmark" : "shield-checkmark-outline"}
-              color={color}
+              color={typeof color === 'string' ? color : theme.colors.textMuted}
               size={22}
             />
           ),
